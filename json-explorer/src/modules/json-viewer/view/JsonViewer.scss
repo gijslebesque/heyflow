@@ -1,0 +1,40 @@
+
+ul {
+    padding-left: 1rem;
+    li {
+        list-style-type: none;
+        margin-left: 1rem;
+    }
+}
+
+.input-wrapper {
+ 
+    label {
+        display: block;
+        margin-bottom: 0.5em;
+    }
+    input {
+        padding: 0.5em;
+        border: 1px solid #ccc;
+        border-radius: 0.25em;
+        font-size: 1em;
+    }
+}
+
+.json-view-container {
+    border: 1px solid #ccc;
+}
+
+.json-view {
+    .json-property {
+        cursor: pointer;    
+        color: powderblue;
+    }
+
+    .json-property:hover {
+        text-decoration: underline;
+    }
+    .json-value{
+        margin-top: 0px;
+    }
+}
