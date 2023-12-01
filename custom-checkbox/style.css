@@ -1,0 +1,33 @@
+
+.custom-checkbox {
+    width: 1.2rem;
+    height: 1.2rem;
+    cursor: pointer;
+    border: 1px solid black;
+    border-radius: 4px;
+}
+  
+.custom-checkbox:focus, .focus {
+    outline: 2px solid blue;
+    outline-offset: 1px;
+}
+  
+.checkbox-icon {
+    visibility: hidden;
+}
+  
+.custom-checkbox[aria-checked="true"] .checkbox-icon {
+    visibility: visible;
+    color: white;
+    background: black;  
+}
+  
+.visually-hidden {
+    position: absolute;
+    clip: rect(0 0 0 0);
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    white-space: nowrap;
+}
