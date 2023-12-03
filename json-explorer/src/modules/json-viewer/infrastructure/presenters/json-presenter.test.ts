@@ -47,4 +47,29 @@ describe('JsonPresenter', () => {
 
         expect(viewMock.handlePropertyClick).toHaveBeenCalledWith(path);
     });
+
+    it('should calculate view data correctly', () => {
+        const obj = {
+            key1: 'value1',
+            key2: {
+                nestedKey: 'nestedValue',
+            },
+            key3: [1, 2, 3],
+        };
+        const path = '';
+        const key = 'key1';
+
+        const expectedViewData = {
+            newPath: 'key1',
+            value: 'value1,',
+            isInt: false,
+            showNested: false,
+            isArr: false,
+            className: 'json-property',
+        };
+
+        const viewData = presenter.calcJsonViewProperties({ obj, path, key });
+
+        expect(viewData).toEqual(expectedViewData);
+    });
 });

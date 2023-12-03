@@ -1,19 +1,19 @@
 import { useEffect, useState } from 'react';
 import { getJsonPresenter } from '../infrastructure/di-container';
 import './JsonViewer.scss';
+import { AnyJson, JsonPresenter, JsonView } from '../infrastructure/presenters/json-presenter';
 
 interface JSONViewerProps {
-    data: {
-        [key: string]: any;
-    };
+    data: AnyJson;
 }
+
 
 export const JSONViewer: React.FC<JSONViewerProps> = ({ data }) => {
     const [currentPath, setCurrentPath] = useState<string>('');
     const [pathValue, setPathValue] = useState<string>('');
     const [inputValue, setInputValue] = useState<string>('');
 
-    const view = {
+    const view: JsonView = {
         handleValueOfPath: (value: string) => {
             setPathValue(value);
         },
@@ -28,10 +28,6 @@ export const JSONViewer: React.FC<JSONViewerProps> = ({ data }) => {
 
     const presenter = getJsonPresenter(view, data);
 
-    const handlePropertyClickListener = (path: string) => {
-        presenter.handlePropertyClick(path);
-    };
-
     useEffect(() => {
         presenter.handleValueOfPath(currentPath);
     }, [currentPath]);
@@ -44,46 +40,6 @@ export const JSONViewer: React.FC<JSONViewerProps> = ({ data }) => {
         presenter.handleInputChange(e.target.value);
     };
 
-    const renderObject = (
-        obj: {
-            [key: string]: any;
-        },
-        path: string = '',
-    ) => {
-        return (
-            <ul className="json-view">
-                {Object.keys(obj).map((key, index) => {
-                    //TODO: all this logic should be moved to a util class
-                    //so we can test it
-                    const newPath = path ? `${path}.${key}` : key;
-                    const value = `${obj[key]},`;
-
-                    const isInt = Number.isInteger(parseInt(key));
-
-                    const showRecursive = typeof obj[key] === 'object';
-
-                    const isArr = Array.isArray(obj[key]);
-
-                    const className = showRecursive ? 'json-object' : 'json-property';
-
-                    return (
-                        <li key={index}>
-                            {isInt && '{'}
-                            <span className={`${className}`} onClick={() => handlePropertyClickListener(newPath)}>
-                                {!isInt && `${key}: `}
-                            </span>
-                            {isArr && '['}
-                            {showRecursive && renderObject(obj[key], newPath)}
-                            {!showRecursive && value}
-                            {isInt && '},'}
-                            {isArr && '],'}
-                        </li>
-                    );
-                })}{' '}
-            </ul>
-        );
-    };
-
     return (
         <div>
             <div className="input-wrapper">
@@ -92,7 +48,55 @@ export const JSONViewer: React.FC<JSONViewerProps> = ({ data }) => {
                 <p>Value: {pathValue}</p>
             </div>
             <p>Response</p>
-            <div className="json-view-container">{renderObject(data)}</div>
+            <div className="json-view-container">
+                <JsonPropertyViewer obj={data} path="" presenter={presenter} />
+            </div>
         </div>
+    );
+};
+
+
+const JsonPropertyViewer: React.FC<{ obj: AnyJson; path: string; presenter: JsonPresenter<AnyJson> }> = ({
+    obj,
+    path,
+    presenter,
+}) => {
+    const handlePropertyClickListener = (path: string) => {
+        presenter.handlePropertyClick(path);
+    };
+
+    return (
+        <ul className="json-view">
+            {Object.keys(obj).map((key, index) => {
+                const { isInt, showNested, isArr, className, value, newPath } = presenter.calcJsonViewProperties({
+                    obj,
+                    path,
+                    key,
+                });
+
+                const mappedIcons = {
+                    startObjectIcon: '{',
+                    endObjectIcon: '},',
+                    startArrayIcon: '[',
+                    endArrayIcon: '],',
+                };
+
+                return (
+                    <li key={index}>
+                        {isInt && mappedIcons['startObjectIcon']}
+                        {!isInt && (
+                            <span className={`${className}`} onClick={() => handlePropertyClickListener(newPath)}>
+                                {key}:{' '}
+                            </span>
+                        )}
+                        {isArr && mappedIcons['startArrayIcon']}
+                        {showNested && <JsonPropertyViewer obj={obj[key]} path={newPath} presenter={presenter} />}
+                        {!showNested && value}
+                        {isInt && mappedIcons['endObjectIcon']}
+                        {isArr && mappedIcons['endArrayIcon']}
+                    </li>
+                );
+            })}
+        </ul>
     );
 };

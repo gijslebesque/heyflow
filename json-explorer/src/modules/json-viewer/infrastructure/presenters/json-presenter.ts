@@ -6,6 +6,18 @@ export interface JsonView {
     handlePropertyClick(value: string): void;
 }
 
+export interface AnyJson {
+    [key: string]: any;
+}
+
+export interface JsonProperty {
+    value: string;
+    isInt: boolean;
+    showNested: boolean;
+    isArr: boolean;
+    className: 'json-object' | 'json-property';
+    newPath: string;
+}
 
 export class JsonPresenter<T> {
     constructor
@@ -41,4 +53,28 @@ export class JsonPresenter<T> {
         return value.toString();
     }
 
+
+    public calcJsonViewProperties({
+        obj,
+        path,
+        key,
+    }: { obj: AnyJson, path: string, key: string }): JsonProperty {
+        const newPath = path ? `${path}.${key}` : key;
+        const value = `${obj[key]},`;
+
+        const isInt = Number.isInteger(parseInt(key));
+        const showNested = typeof obj[key] === 'object';
+        const isArr = Array.isArray(obj[key]);
+        const className = showNested ? 'json-object' : 'json-property';
+
+        return {
+            newPath: newPath,
+            value,
+            isInt,
+            showNested: showNested,
+            isArr,
+            className
+        };
+
+    }
 }
