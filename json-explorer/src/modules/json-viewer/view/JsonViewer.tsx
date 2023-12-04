@@ -44,7 +44,7 @@ export const JSONViewer: React.FC<JSONViewerProps> = ({ data }) => {
         <div>
             <div className="input-wrapper">
                 <label htmlFor="property">Property</label>
-                <input name="property" type="text" onChange={changeListener} value={inputValue} />
+                <input id="property" type="text" onChange={changeListener} value={inputValue} />
                 <p>Value: {pathValue}</p>
             </div>
             <p>Response</p>
